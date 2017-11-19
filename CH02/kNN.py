@@ -4,6 +4,7 @@ from numpy import *
 import operator
 import matplotlib
 import matplotlib.pyplot as plt
+from os import listdir
 
 def createDataSet():
     group = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1]])
@@ -51,6 +52,11 @@ def classify0(inX, dataSet, labels, k):
 
 
 def file2matrix(filename):
+    '''
+    将文件里的数据转成矩阵形式matrix
+    :param filename: 
+    :return: 
+    '''
     fr = open(filename)
     arrayOLines = fr.readlines()
     numberOfLines = len(arrayOLines)
@@ -71,6 +77,11 @@ def file2matrix(filename):
     return returnMat, classLabelVector
 
 def autoNorm(dataSet):
+    '''
+    归一化
+    :param dataSet: 
+    :return: 
+    '''
     minVals = dataSet.min(0)
     maxVals = dataSet.max(0)
     ranges = maxVals - minVals
@@ -79,6 +90,33 @@ def autoNorm(dataSet):
     normDataSet = dataSet - tile(minVals,(m,1))
     normDataSet = normDataSet/tile(ranges,(m,1))
     return normDataSet, ranges, minVals
+
+def img2vector(filename):
+    '''
+    图片向量化
+    :param filename: 
+    :return: 
+    '''
+    returnVect = zeros((1,1024))
+    fr = open(filename)
+    for i in  range(32):
+        lineStr = fr.readlines()
+        for j in range(32):
+            returnVect[0,32*i + j] = int(lineStr[j])
+    return returnVect
+
+def handwritingClassTest():
+    hwLabels = []
+    trainingFileList = listdir('trainingDigits')
+    m = len(trainingFileList)
+    trainingMat = zeros((m, 1024))
+    for i in range(m) :
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
+    testFileList = listdir('testDigits')
 
 
 
