@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from math import log
+import operator
 
 def calcShannonEnt(dataSet):
     '''
@@ -69,13 +70,25 @@ def chooseBestFeatureToSplit(dataSet):
         for value in uniqueVals:
             subDataSet = splitDataSet(dataSet, i, value)
             prob = len(subDataSet)/float(len(dataSet))
-            newEntropy += prob* calcShannonEnt(subDataSet)
+            newEntropy += prob * calcShannonEnt(subDataSet)
         infoGain = baseEntropy - newEntropy
         if (infoGain > bestInfoGain):
             bestInfoGain = infoGain
             bestFeature = i
     return bestFeature
 
+def majorityCnt(classList):
+    '''
+    多数表决
+    :param classList: 类的标签列表
+    :return: 占多数的类
+    '''
+    classCount = {}
+    for vote in classList:
+        if vote not in classCount.keys(): classCount[vote] = 0
+        classCount[vote] += 1
+    sortedClassCount = sorted(classCount.iteritems(), key= operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
 
 if __name__ == '__main__':
     dataSet, labels = createDataSet()
