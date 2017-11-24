@@ -2,6 +2,7 @@
 
 from math import log
 import operator
+import treePlotter
 
 def calcShannonEnt(dataSet):
     '''
@@ -87,8 +88,52 @@ def majorityCnt(classList):
     for vote in classList:
         if vote not in classCount.keys(): classCount[vote] = 0
         classCount[vote] += 1
-    sortedClassCount = sorted(classCount.iteritems(), key= operator.itemgetter(1), reverse=True)
+    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
     return sortedClassCount[0][0]
+
+def createTree(dataSet, labels):
+    '''
+    创建决策树
+    :param dataSet:
+    :param labels:
+    :return:
+    '''
+    classList = [example[-1] for example in dataSet]
+    print classList
+    if classList.count(classList[0]) == len(classList):
+        return classList[0]
+    if len(dataSet[0]) == 1:
+        return majorityCnt(classList)
+    bestFeat = chooseBestFeatureToSplit(dataSet)
+    bestFeatLabel = labels[bestFeat]
+    myTree = {bestFeatLabel:{}}
+    del(labels[bestFeat])
+    featValues = [example[bestFeat] for example in dataSet]
+    uniqueVals = set(featValues)
+    for value in uniqueVals:
+        subLabels = labels[:]
+        myTree[bestFeatLabel][value] = createTree(splitDataSet(
+            dataSet, bestFeat, value), subLabels)
+    return myTree
+
+def classify(inputTree, featLabels, testVec):
+    '''
+    用训练出来的决策树来进行测试集的预测
+    :param inputTree: 训练出的决策树模型
+    :param featLabels: 特征标签集
+    :param testVec: 测试集
+    :return: 所属类型(预测结果)
+    '''
+    firstStr = inputTree.keys()[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
 
 if __name__ == '__main__':
     dataSet, labels = createDataSet()
@@ -104,5 +149,14 @@ if __name__ == '__main__':
     #     for value in uniqueVals:
     #         subDataSet = splitDataSet(dataSet, i, value)
     #         prob = len(subDataSet) / float(len(dataSet))
-    print chooseBestFeatureToSplit(dataSet)
-
+    # print chooseBestFeatureToSplit(dataSet)
+    # classList = [example[-1] for example in dataSet]
+    # print classList
+    # print len(dataSet[0])
+    # bestFeat = chooseBestFeatureToSplit(dataSet)
+    # print bestFeat
+    # bestFeatLabel = labels[bestFeat]
+    # print bestFeatLabel
+    myTree = treePlotter.retrieveTree(0)
+    print myTree
+    print classify(myTree, labels, [1, 0])
