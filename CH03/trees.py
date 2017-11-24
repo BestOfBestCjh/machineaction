@@ -135,6 +135,28 @@ def classify(inputTree, featLabels, testVec):
                 classLabel = secondDict[key]
     return classLabel
 
+def storeTree(inputTree, filename):
+    '''
+    存储构建好的决策树
+    :param inputTree:
+    :param filename: 文件名
+    :return:
+    '''
+    import pickle
+    fw = open(filename,'w')
+    pickle.dump(inputTree,fw)
+    fw.close()
+
+def grabTree(filename):
+    '''
+    读取已经构建好的决策树
+    :param filename:
+    :return:
+    '''
+    import pickle
+    fr = open(filename)
+    return pickle.load(fr)
+
 if __name__ == '__main__':
     dataSet, labels = createDataSet()
     print dataSet
@@ -157,6 +179,16 @@ if __name__ == '__main__':
     # print bestFeat
     # bestFeatLabel = labels[bestFeat]
     # print bestFeatLabel
-    myTree = treePlotter.retrieveTree(0)
-    print myTree
-    print classify(myTree, labels, [1, 0])
+    # myTree = treePlotter.retrieveTree(0)
+    # print myTree
+    # print classify(myTree, labels, [1, 0])
+    # storeTree(myTree,'tree.txt')
+    # print grabTree('tree.txt')
+    # 测试隐形眼镜数据集
+    fr = open('lenses.txt')
+    lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+    print lenses
+    lensesLabels = ['age', 'prescript', 'astigmatic', 'tearRate']
+    lensesTree = createTree(lenses, lensesLabels)
+    print lensesTree
+    treePlotter.createPlot(lensesTree)
