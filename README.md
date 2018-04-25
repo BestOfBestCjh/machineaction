@@ -1,2 +1,2 @@
 # machineaction
-机器学习实战code
+机器学习相关算法手写code
